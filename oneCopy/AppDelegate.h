@@ -12,6 +12,7 @@
 
 - (IBAction)pullAction:(id)sender;
 - (IBAction)pushAction:(id)sender;
+- (IBAction)settingsAction:(id)sender;
 
 @end
 

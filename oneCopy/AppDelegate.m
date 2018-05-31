@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "SettingsWindow.h"
 
 @interface AppDelegate ()
 @property (strong) NSStatusItem *statusItem;
@@ -19,6 +20,8 @@
 @property (strong) NSImage* iconImageUpDown;
 @property (strong) NSImage* iconImageDown;
 @property (strong) NSImage* iconImageErr;
+@property (strong) SettingsWindow* settingsWindow;
+
 @end
 
 @implementation AppDelegate
@@ -26,6 +29,14 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
     
+    //TODO: use this to store config
+    //NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    //[userDefaults setValue:@"test" forKey:@"key"];
+    //NSString *loadedKey = [userDefaults stringForKey:@"key"];
+    //NSLog(@"%@", loadedKey);
+    
+    
+    _settingsWindow = [[SettingsWindow alloc] initWithWindowNibName:@"SettingsWindow"];
     
     NSLog ( @"applicationDidFinishLaunching");
     NSLog(@"%@", [[NSBundle mainBundle] resourceURL]);
@@ -49,6 +60,7 @@
     
     [_menu addItemWithTitle:@"push" action:@selector(pushAction:) keyEquivalent:@""];
     [_menu addItemWithTitle:@"pull" action:@selector(pullAction:) keyEquivalent:@""];
+    [_menu addItemWithTitle:@"settings" action:@selector(settingsAction:) keyEquivalent:@""];
     
     _statusItem.menu = _menu;
 
@@ -64,6 +76,7 @@
     //TODO
     NSLog(@"pullAction");
     
+
     
     
     
@@ -151,6 +164,15 @@
         }
     }];
     [dataTask resume];
+}
+
+
+
+- (IBAction)settingsAction:(id)sender {
+    NSLog(@"settingsAction");
+    
+    [_settingsWindow showWindow:self];
+
 }
 
 
