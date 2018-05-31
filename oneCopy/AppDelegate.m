@@ -56,6 +56,7 @@
     _menu = [NSMenu alloc];
     [_menu addItemWithTitle:@"push" action:@selector(pushAction:) keyEquivalent:@""];
     [_menu addItemWithTitle:@"pull" action:@selector(pullAction:) keyEquivalent:@""];
+    [_menu addItem:[NSMenuItem separatorItem]];
     [_menu addItemWithTitle:@"settings" action:@selector(settingsAction:) keyEquivalent:@""];
     _statusItem.menu = _menu;
 }
