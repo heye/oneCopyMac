@@ -118,17 +118,9 @@ didCompleteWithError:(NSError *)error{
         return;
     
     
-    // NSData from the Base64 encoded str
-    NSData *dataB64 = [[NSData alloc]
-                                      initWithBase64EncodedString:valueB64 options:0];
+    NSLog(@"pull clipboard value: %@",valueB64);
     
-    // Decoded NSString from the NSData
-    NSString *value = [[NSString alloc]
-                               initWithData:dataB64 encoding:NSUTF8StringEncoding];
-    
-    NSLog(@"pull clipboard value: %@",value);
-    
-    [Clipboard setString:value];
+    [Clipboard setStringB64:valueB64];
     [Notifications make:@"pull success"];
 }
 
@@ -158,12 +150,8 @@ didCompleteWithError:(NSError *)error{
         return;
     _isStarted = true;
     
-    // Get NSString from NSData object in Base64
-    NSData *nsdata = [value dataUsingEncoding:NSUTF8StringEncoding];
-    NSString *valueB64 = [nsdata base64EncodedStringWithOptions:0];
-    
     //build json request
-    NSString *postJson =[NSString stringWithFormat:@"{\"type\":\"set_key\",\"key\":\"%@\",\"value\":\"%@\"}",key,valueB64];
+    NSString *postJson =[NSString stringWithFormat:@"{\"type\":\"set_key\",\"key\":\"%@\",\"value\":\"%@\"}",key,value];
     
     _isPush = true;
     

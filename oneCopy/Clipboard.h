@@ -10,7 +10,13 @@
 
 @interface Clipboard : NSObject
 
-+(void) setString:(NSString*)text;
-+(NSString*) getString;
++(void) setStringB64:(NSString*)valueB64;
++(NSString*) getStringB64;
 
++(BOOL) isFile;
++(NSString*) getFileB64;
++(void) setFileB64:(NSString*)valueB64 fileName: (NSString*) fileName;
+
++ (NSURL*)applicationDataDirectory;
++(void) createDir:(NSString*)dir;
 @end

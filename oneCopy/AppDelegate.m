@@ -59,6 +59,11 @@
     [_menu addItem:[NSMenuItem separatorItem]];
     [_menu addItemWithTitle:@"settings" action:@selector(settingsAction:) keyEquivalent:@""];
     _statusItem.menu = _menu;
+    
+    
+    //NSLog(@"%@", [Clipboard getStringB64]);
+    //[Clipboard getFileB64];
+    //[Clipboard setFileB64:@"dGVzdGZk"fileName:@"testfile.txt"];
 }
 
 
@@ -79,11 +84,11 @@
 - (IBAction)pushAction:(id)sender {
     
     NSString* apiKey = [ConfigStore loadKeyOne];
-    NSString* clipboadValue = [Clipboard getString];
+    NSString* clipboadValueB64 = [Clipboard getStringB64];
     NSString* serverAddr = [ConfigStore loadServerAddr];
     
     ServerRequest *sReq = [ServerRequest alloc];
-    [sReq pushKey:apiKey andValue:clipboadValue toServer:serverAddr];
+    [sReq pushKey:apiKey andValue:clipboadValueB64 toServer:serverAddr];
 }
 
 - (IBAction)settingsAction:(id)sender {

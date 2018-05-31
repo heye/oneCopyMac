@@ -43,7 +43,13 @@
 }
 
 +(NSString*) loadServerAddr {
-    return [self loadValue:@"server"];
+    NSString* serverAddr = [self loadValue:@"server"];
+    
+    if(serverAddr == @""){
+        return @"https://azenix.io";
+    }
+    
+    return serverAddr;
 }
 
 +(void) storeServerAddr:(NSString *)key {
