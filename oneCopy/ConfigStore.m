@@ -42,5 +42,13 @@
     return [self loadValue:@"label"];
 }
 
++(NSString*) loadServerAddr {
+    return [self loadValue:@"server"];
+}
+
++(void) storeServerAddr:(NSString *)key {
+    [self storeValue:key withKey:@"server"];
+}
+
 
 @end

@@ -66,10 +66,12 @@ didCompleteWithError:(NSError *)error{
     
     if(_serverError){
         //TODO: notification
+        [Notifications make:@"cannot reach the server"];
         return;
     }
     
     if(_localError){
+        [Notifications make:@"cannot reach the server"];
         //TODO: notification
         return;
     }

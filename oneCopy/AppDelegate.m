@@ -69,24 +69,27 @@
 
 - (IBAction)pullAction:(id)sender {
     NSString* apiKey = [ConfigStore loadKeyOne];
+    NSString* serverAddr = [ConfigStore loadServerAddr];
     
     ServerRequest *sReq = [ServerRequest alloc];
-    [sReq pullKey:apiKey fromServer:@"https://azenix.io"];
+    [sReq pullKey:apiKey fromServer:serverAddr];
 }
 
 - (IBAction)pushAction:(id)sender {
     
     NSString* apiKey = [ConfigStore loadKeyOne];
     NSString* clipboadValue = [Clipboard getString];
+    NSString* serverAddr = [ConfigStore loadServerAddr];
     
     ServerRequest *sReq = [ServerRequest alloc];
-    [sReq pushKey:apiKey andValue:clipboadValue toServer:@"https://azenix.io"];
+    [sReq pushKey:apiKey andValue:clipboadValue toServer:serverAddr];
 }
 
 - (IBAction)settingsAction:(id)sender {
-    NSLog(@"settingsAction");
     
     [_settingsWindow showWindow:self];
+    
+    [NSApp activateIgnoringOtherApps:YES];
 }
 
 

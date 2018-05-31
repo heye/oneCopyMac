@@ -16,6 +16,9 @@
 +(void) storeLabelOne: (NSString*)key;
 +(NSString*) loadLabelOne;
 
++(void) storeServerAddr: (NSString*)key;
++(NSString*) loadServerAddr;
+
 
 +(void) storeValue: (NSString*)value withKey: (NSString*) key;
 +(NSString*) loadValue: (NSString*)key;
