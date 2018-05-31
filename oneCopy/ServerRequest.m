@@ -113,14 +113,22 @@ didCompleteWithError:(NSError *)error{
 -(void) handlePullReply{
     NSLog(@"handlePullReply");
     
-    NSString *clipboardValue = _replyDoc[@"value"];
-    if(!clipboardValue)
+    NSString *valueB64 = _replyDoc[@"value"];
+    if(!valueB64)
         return;
     
     
-    NSLog(@"pull clipboard value: %@",clipboardValue);
+    // NSData from the Base64 encoded str
+    NSData *dataB64 = [[NSData alloc]
+                                      initWithBase64EncodedString:valueB64 options:0];
     
-    [Clipboard setString:clipboardValue];
+    // Decoded NSString from the NSData
+    NSString *value = [[NSString alloc]
+                               initWithData:dataB64 encoding:NSUTF8StringEncoding];
+    
+    NSLog(@"pull clipboard value: %@",value);
+    
+    [Clipboard setString:value];
     [Notifications make:@"pull success"];
 }
 
@@ -150,8 +158,12 @@ didCompleteWithError:(NSError *)error{
         return;
     _isStarted = true;
     
+    // Get NSString from NSData object in Base64
+    NSData *nsdata = [value dataUsingEncoding:NSUTF8StringEncoding];
+    NSString *valueB64 = [nsdata base64EncodedStringWithOptions:0];
+    
     //build json request
-    NSString *postJson =[NSString stringWithFormat:@"{\"type\":\"set_key\",\"key\":\"%@\",\"value\":\"%@\"}",key,value];
+    NSString *postJson =[NSString stringWithFormat:@"{\"type\":\"set_key\",\"key\":\"%@\",\"value\":\"%@\"}",key,valueB64];
     
     _isPush = true;
     
