@@ -161,6 +161,9 @@ didCompleteWithError:(NSError *)error{
         
         
         [Clipboard setFileData:_fileData  fileName:_fileName];
+        
+        NSString *notificationString =[NSString stringWithFormat:@"pulled file %@",_fileName];
+        [Notifications make:notificationString];
     }
 }
 
