@@ -12,6 +12,12 @@
 
 @implementation Clipboard
 
++(void) setString:(NSString*)value{
+    NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
+    [myPasteboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:self];
+    [myPasteboard setString:value forType:NSPasteboardTypeString];
+}
+
 +(void) setStringB64:(NSString*)valueB64{
     
     // string -> data
@@ -22,14 +28,16 @@
     NSString *value = [[NSString alloc]
                        initWithData:dataB64 encoding:NSUTF8StringEncoding];
     
+    [Clipboard setString:value];
+}
+
++(NSString*) getString{
     NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
-    [myPasteboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:self];
-    [myPasteboard setString:value forType:NSPasteboardTypeString];
+    return [myPasteboard  stringForType:NSPasteboardTypeString];
 }
 
 +(NSString*) getStringB64{
-    NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
-    NSString* value = [myPasteboard  stringForType:NSPasteboardTypeString];
+    NSString* value = [Clipboard getString];
     
     // Get NSString from NSData object in Base64
     NSData *nsdata = [value dataUsingEncoding:NSUTF8StringEncoding];
@@ -52,7 +60,7 @@
 }
 
 
-+(NSString*) getFileB64{
++(NSData*) getFile{
     //NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
     //NSString* value = [myPasteboard  stringForType:NSPasteboardTypeString];
     
@@ -71,7 +79,7 @@
     
     if([fileURLs count] == 0){
         NSLog(@"no copied file found");
-        return @"";
+        return [[NSData alloc] init];
     }
     
     NSURL* filePath = [fileURLs firstObject];
@@ -83,15 +91,12 @@
 
     if(fileSize > 1000000){
         [Notifications make:@"file must be < 1MB"];
-        return @"";
+        return [[NSData alloc] init];
     }
 
     
     NSFileHandle * fileHandle = [NSFileHandle fileHandleForReadingFromURL: filePath error:nil];
-    NSData *fileData = [fileHandle readDataToEndOfFile];
-    NSString *fileDataB64 = [fileData base64EncodedStringWithOptions:0];
-    
-    return fileDataB64;
+    return [fileHandle readDataToEndOfFile];
 }
 
 + (NSURL*)applicationDataDirectory {

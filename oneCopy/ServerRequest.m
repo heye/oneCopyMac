@@ -20,14 +20,22 @@
         _serverError = false;
         _isPull = false;
         _isPush = false;
+        _isFilePush = false;
         _replyDoc = [NSDictionary alloc];
         _isStarted = false;
+        _pushedFileName = @"";
+        _serverAddr = @"";
+        _apiKey = @"";
     }
     return self;
 }
 
+
 -(void) makeRequestWithJSON:(NSString*)json toServer: (NSString*) server{
-    NSLog(@"request:%@", json);
+    NSData *jsonData = [json dataUsingEncoding:NSUTF8StringEncoding];
+    [self makeRequestWithDATA:jsonData toURL:server];
+    
+    /*NSLog(@"request:%@", json);
     
     NSMutableURLRequest *urlRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:server]];
     
@@ -47,9 +55,30 @@
     
     NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:urlRequest];
     
-    [dataTask resume];
+    [dataTask resume];*/
 }
 
+
+-(void) makeRequestWithDATA:(NSData*)data toURL: (NSString*) address{
+    NSLog(@"request to:%@", address);
+    
+    NSMutableURLRequest *urlRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:address]];
+    
+    //create the Method "GET" or "POST"
+    [urlRequest setHTTPMethod:@"POST"];
+    
+    
+    //Apply the data to the body
+    [urlRequest setHTTPBody:data];
+    
+    NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
+    
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:nil];
+    
+    NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:urlRequest];
+    
+    [dataTask resume];
+}
 
 
 - (void)URLSession:(NSURLSession *)session
@@ -127,7 +156,19 @@ didCompleteWithError:(NSError *)error{
 -(void) handlePushReply{
     NSLog(@"handlePushReply");
 
-    [Notifications make:@"push success"];
+    //on file push - copy link to clipboard
+    if(_isFilePush){
+        //build file link
+        NSString *fileLink =[NSString stringWithFormat:@"%@/file/%@/%@",_serverAddr,_apiKey,_pushedFileName];
+        
+        //write file link to clipboard
+        [Clipboard setString:fileLink];
+        
+        [Notifications make:@"file push success - copied link"];
+    }
+    else{
+        [Notifications make:@"push success"];
+    }
 }
 
 
@@ -140,6 +181,8 @@ didCompleteWithError:(NSError *)error{
     NSString *postJson =[NSString stringWithFormat:@"{\"type\":\"get_key\",\"key\":\"%@\"}",key];
     
     _isPull = true;
+    _serverAddr = server;
+    _apiKey = key;
     
     //start request
     [self makeRequestWithJSON:postJson toServer:server];
@@ -154,11 +197,32 @@ didCompleteWithError:(NSError *)error{
     NSString *postJson =[NSString stringWithFormat:@"{\"type\":\"set_key\",\"key\":\"%@\",\"value\":\"%@\"}",key,value];
     
     _isPush = true;
+    _serverAddr = server;
+    _apiKey = key;
     
     //start request
     [self makeRequestWithJSON:postJson toServer:server];
 }
 
+
+-(void) pushFileData:(NSData*) data toServer: (NSString*)server withKey: (NSString*) apikey andName: (NSString*) fileName{
+
+    if(_isStarted)
+        return;
+    _isStarted = true;
+    
+    //build json request
+    NSString *urlWithKey =[NSString stringWithFormat:@"%@/file/%@",server,apikey];
+    
+    _isPush = true;
+    _isFilePush = true;
+    _pushedFileName = fileName;
+    _serverAddr = server;
+    _apiKey = apikey;
+    
+    //start request
+    [self makeRequestWithDATA:data toURL:urlWithKey];
+}
 
 @end
 

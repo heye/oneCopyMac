@@ -89,6 +89,13 @@
     
     ServerRequest *sReq = [ServerRequest alloc];
     [sReq pushKey:apiKey andValue:clipboadValueB64 toServer:serverAddr];
+    
+    if([Clipboard isFile]){
+        ServerRequest *fileRequest = [ServerRequest alloc];
+        NSString* clipboadValue = [Clipboard getString];
+        NSData *fileData = [Clipboard getFile];
+        [fileRequest pushFileData:fileData toServer:serverAddr withKey:apiKey andName:clipboadValue];
+    }
 }
 
 - (IBAction)settingsAction:(id)sender {
