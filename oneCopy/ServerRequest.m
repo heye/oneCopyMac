@@ -19,13 +19,16 @@
         _localError = false;
         _serverError = false;
         _isPull = false;
+        _isFilePull = false;
         _isPush = false;
         _isFilePush = false;
         _replyDoc = [NSDictionary alloc];
         _isStarted = false;
-        _pushedFileName = @"";
+        _fileName = @"";
         _serverAddr = @"";
         _apiKey = @"";
+        _noNotify = false;
+        _fileData = [[NSMutableData alloc] initWithLength:0];
     }
     return self;
 }
@@ -34,28 +37,6 @@
 -(void) makeRequestWithJSON:(NSString*)json toServer: (NSString*) server{
     NSData *jsonData = [json dataUsingEncoding:NSUTF8StringEncoding];
     [self makeRequestWithDATA:jsonData toURL:server];
-    
-    /*NSLog(@"request:%@", json);
-    
-    NSMutableURLRequest *urlRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:server]];
-    
-    //create the Method "GET" or "POST"
-    [urlRequest setHTTPMethod:@"POST"];
-    
-    //Convert the String to Data
-    NSData *jsonData = [json dataUsingEncoding:NSUTF8StringEncoding];
-    
-    
-    //Apply the data to the body
-    [urlRequest setHTTPBody:jsonData];
-    
-    NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
-
-    NSURLSession *session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:nil];
-    
-    NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:urlRequest];
-    
-    [dataTask resume];*/
 }
 
 
@@ -65,11 +46,14 @@
     NSMutableURLRequest *urlRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:address]];
     
     //create the Method "GET" or "POST"
-    [urlRequest setHTTPMethod:@"POST"];
-    
-    
-    //Apply the data to the body
-    [urlRequest setHTTPBody:data];
+    if(_isFilePull){
+        [urlRequest setHTTPMethod:@"GET"];
+    }
+    else {
+        [urlRequest setHTTPMethod:@"POST"];
+        //Apply the data to the body
+        [urlRequest setHTTPBody:data];
+    }
     
     NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
     
@@ -85,7 +69,7 @@
               task:(NSURLSessionTask *)task
 didCompleteWithError:(NSError *)error{
     
-    //NSLog(@"didCompleteWithError");
+    NSLog(@"didCompleteWithError");
 
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)[task response];
     if(httpResponse.statusCode != 200) {
@@ -105,12 +89,14 @@ didCompleteWithError:(NSError *)error{
         return;
     }
     
-    NSLog(@"Server reply: %@", _replyDoc);
+    if(!_isFilePull){
+        NSLog(@"Server reply: %@", _replyDoc);
     
-    NSString *apiErr = _replyDoc[@"err"];
-    if(apiErr){
-        [Notifications make:apiErr];
-        return;
+        NSString *apiErr = _replyDoc[@"err"];
+        if(apiErr){
+            [Notifications make:apiErr];
+            return;
+        }
     }
     
     if (_isPull) {
@@ -128,13 +114,15 @@ didCompleteWithError:(NSError *)error{
           dataTask:(NSURLSessionDataTask *)dataTask
     didReceiveData:(NSData *)data{
 
-    //NSLog(@"didReceiveData");
+    NSLog(@"didReceiveData");
     
-    NSError *parseError = nil;
-    _replyDoc =[NSJSONSerialization JSONObjectWithData:data options:0 error:&parseError];
-    
-    if(parseError){
-        
+    if(!_isFilePull){
+        NSError *parseError = nil;
+        _replyDoc =[NSJSONSerialization JSONObjectWithData:data options:0 error:&parseError];
+    }
+    else{
+        [_fileData appendData:data];
+        NSLog(@"added file data new size: %lu", [_fileData length]);
     }
 }
 
@@ -142,15 +130,38 @@ didCompleteWithError:(NSError *)error{
 -(void) handlePullReply{
     NSLog(@"handlePullReply");
     
-    NSString *valueB64 = _replyDoc[@"value"];
-    if(!valueB64)
-        return;
+    //set clipboard value is this is not a file pull
+    if(!_isFilePull){
+        NSString *valueB64 = _replyDoc[@"value"];
+        if(!valueB64)
+            return;
+        
+        NSLog(@"pulled clipboard value: %@",valueB64);
+        
+        [Clipboard setStringB64:valueB64];
+        
+        //if this is a file name we also have to pull the file
+        if([_replyDoc[@"is_file"] boolValue]){
+            NSLog(@"this is a file - will pull the file");
+            
+            //get the file name we just wrote to the clipboard
+            _fileName = [Clipboard getString];
+            
+            ServerRequest *sReq = [[ServerRequest alloc] init];
+            [sReq pullFileWithKey:_apiKey andName:_fileName fromServer:_serverAddr];
+ 
+        }
+    }
     
-    
-    NSLog(@"pull clipboard value: %@",valueB64);
-    
-    [Clipboard setStringB64:valueB64];
-    [Notifications make:@"pull success"];
+    if(_isFilePull){
+        NSLog(@"setting file with size %lu to clipboard", (unsigned long)[_fileData length]);
+        
+        //take file data and set clipboard
+        //NSData *data = [NSData m]
+        
+        
+        [Clipboard setFileData:_fileData  fileName:_fileName];
+    }
 }
 
 -(void) handlePushReply{
@@ -159,7 +170,7 @@ didCompleteWithError:(NSError *)error{
     //on file push - copy link to clipboard
     if(_isFilePush){
         //build file link
-        NSString *fileLink =[NSString stringWithFormat:@"%@/file/%@/%@",_serverAddr,_apiKey,_pushedFileName];
+        NSString *fileLink =[NSString stringWithFormat:@"%@/file/%@/%@",_serverAddr,_apiKey,_fileName];
         
         //write file link to clipboard
         [Clipboard setString:fileLink];
@@ -167,8 +178,14 @@ didCompleteWithError:(NSError *)error{
         [Notifications make:@"file push success - copied link"];
     }
     else{
-        [Notifications make:@"push success"];
+        if(!_noNotify){
+            [Notifications make:@"push success"];
+        }
     }
+}
+
+-(void) noNotification{
+    _noNotify = true;
 }
 
 
@@ -205,6 +222,20 @@ didCompleteWithError:(NSError *)error{
 }
 
 
+-(void) pullFileWithKey:(NSString*)key andName: (NSString*) name fromServer: (NSString*) server{
+    //start pull
+    _isPull = true;
+    _isFilePull = true;
+    _apiKey  = key;
+    _serverAddr = server;
+    _fileName = name;
+    
+    NSString *fileLink =[NSString stringWithFormat:@"%@/file/%@/%@",_serverAddr,_apiKey,_fileName];
+
+    [self makeRequestWithDATA:nil toURL:fileLink];
+}
+
+
 -(void) pushFileData:(NSData*) data toServer: (NSString*)server withKey: (NSString*) apikey andName: (NSString*) fileName{
 
     if(_isStarted)
@@ -216,7 +247,7 @@ didCompleteWithError:(NSError *)error{
     
     _isPush = true;
     _isFilePush = true;
-    _pushedFileName = fileName;
+    _fileName = fileName;
     _serverAddr = server;
     _apiKey = apikey;
     

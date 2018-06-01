@@ -15,23 +15,31 @@
 
 -(void) pullKey:(NSString*)key fromServer: (NSString*) server;
 -(void) pushKey:(NSString*)key andValue: (NSString*) value toServer: (NSString*) server;
+
+-(void) pullFileWithKey:(NSString*)key andName: (NSString*) name fromServer: (NSString*) server;
 -(void) pushFileData:(NSData*) data toServer: (NSString*)server withKey: (NSString*) apikey andName: (NSString*) fileName;
 
 //called after finishing a pull type request
 -(void) handlePullReply;
 -(void) handlePushReply;
 
+-(void) noNotification;
+
 @property (strong) NSDictionary* replyDoc;
+@property (strong) NSMutableData* fileData;
 
 @property BOOL localError;
 @property BOOL serverError;
 
 @property BOOL isPull;
+@property BOOL isFilePull;
 @property BOOL isPush;
 @property BOOL isFilePush;
 @property BOOL isStarted;
 
-@property (strong) NSString* pushedFileName;
+@property BOOL noNotify;
+
+@property (strong) NSString* fileName;
 @property (strong) NSString* apiKey;
 @property (strong) NSString* serverAddr;
 

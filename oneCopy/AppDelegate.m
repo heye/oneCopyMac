@@ -87,14 +87,20 @@
     NSString* clipboadValueB64 = [Clipboard getStringB64];
     NSString* serverAddr = [ConfigStore loadServerAddr];
     
-    ServerRequest *sReq = [ServerRequest alloc];
-    [sReq pushKey:apiKey andValue:clipboadValueB64 toServer:serverAddr];
     
     if([Clipboard isFile]){
+        ServerRequest *sReq = [ServerRequest alloc];
+        [sReq noNotify]; //no notification for setting the file name
+        [sReq pushKey:apiKey andValue:clipboadValueB64 toServer:serverAddr];
+        
         ServerRequest *fileRequest = [ServerRequest alloc];
         NSString* clipboadValue = [Clipboard getString];
         NSData *fileData = [Clipboard getFile];
         [fileRequest pushFileData:fileData toServer:serverAddr withKey:apiKey andName:clipboadValue];
+    }
+    else{
+        ServerRequest *sReq = [ServerRequest alloc];
+        [sReq pushKey:apiKey andValue:clipboadValueB64 toServer:serverAddr];
     }
 }
 

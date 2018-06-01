@@ -17,7 +17,7 @@
 
 +(BOOL) isFile;
 +(NSData*) getFile;
-+(void) setFileB64:(NSString*)valueB64 fileName: (NSString*) fileName;
++(void) setFileData:(NSData*)fileData fileName: (NSString*) fileName;
 
 + (NSURL*)applicationDataDirectory;
 +(void) createDir:(NSString*)dir;

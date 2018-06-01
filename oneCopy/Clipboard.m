@@ -121,11 +121,11 @@
     return appDirectory;
 }
 
-+(void) setFileB64:(NSString*)valueB64 fileName: (NSString*) fileName{
-    //content
-    NSString *content = valueB64;
-    NSData *data = [[NSData alloc]
-                    initWithBase64EncodedString:content options:0];
++(void) setFileData:(NSData*)fileData fileName: (NSString*) fileName{
+    
+    if(!fileData){
+        return;
+    }
     
     //get path for a temp dir & the file
     NSURL* appDir = [Clipboard applicationDataDirectory];
@@ -139,7 +139,7 @@
     NSLog(@"%@", fileURL);
     
     //write file to temp dir
-    [[NSFileManager defaultManager] createFileAtPath:fileURL.path contents:data attributes:nil];
+    [[NSFileManager defaultManager] createFileAtPath:fileURL.path contents:fileData attributes:nil];
 
     
     //write file to the pasteboard
