@@ -22,9 +22,6 @@
 - (void)windowDidLoad {
     [super windowDidLoad];
     
-    //_viewController = [[SettingsViewController alloc] init];
-    //[self setContentViewController: _viewController];
-    
     [NSApp activateIgnoringOtherApps:YES];
     
     // Do view setup here.
@@ -34,9 +31,10 @@
     NSString *loadedServer = [ConfigStore loadServerAddr];
     [_serverInput setStringValue:loadedServer];
     
-    
-    //NSLog(@"scale: %f", [[self window] backingScaleFactor]);
-    // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
+    NSString *encKey = [ConfigStore loadEncKeyOne];
+    if([encKey length] > 0){
+        [_encKeyInput setStringValue:@"***"];
+    }
 }
 
 - (IBAction)buttonAction:(id)sender {
@@ -47,6 +45,13 @@
     [ConfigStore storeEncKeyOne:_encKeyInput.stringValue];
     
     [self.window close];
+}
+
+- (IBAction)buttonActionShow:(id)sender {
+    NSLog(@"buttonActionShow");
+    
+    NSString *encKey = [ConfigStore loadEncKeyOne];
+    [_encKeyInput setStringValue:encKey];
 }
 
 

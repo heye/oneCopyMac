@@ -12,6 +12,19 @@
 @implementation Crypto
 
 
++(NSString *) randomStringWithLength: (int) len {
+    NSString *letters = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    NSMutableString *randomString = [NSMutableString stringWithCapacity: len];
+    
+    for (int i=0; i<len; i++) {
+        [randomString appendFormat: @"%C", [letters characterAtIndex: arc4random_uniform((uint32_t)[letters length])]];
+    }
+    
+    return randomString;
+}
+
+
 + (NSData *) decryptData: (NSDictionary*) input andKey: (NSString*) key{
     //NSLog(@"DECRYPT");
     //NSLog(@"%@", key);
@@ -78,13 +91,7 @@
     
     NSMutableDictionary *outDict = [[NSMutableDictionary alloc] init];
 
-    NSString *ivB64 = @"12345678123456781234567812345678";
-    
-    // string -> data
-    NSData *ciphertext = [[NSData alloc] init];
-    
-    
-    
+    NSString *ivB64 = [Crypto randomStringWithLength: 32];
     
     // 'key' should be 32 bytes for AES256, will be null-padded otherwise
     char keys[kCCKeySizeAES256 + 1];
