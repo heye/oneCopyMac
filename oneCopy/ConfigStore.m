@@ -42,6 +42,14 @@
     return [self loadValue:@"label"];
 }
 
++(void) storeEncKeyOne:(NSString*)key {
+    [self storeValue:key withKey:@"encKeyOne"];
+}
+
++(NSString*) loadEncKeyOne {
+    return [self loadValue:@"encKeyOne"];
+}
+
 +(NSString*) loadServerAddr {
     NSString* serverAddr = [self loadValue:@"server"];
     

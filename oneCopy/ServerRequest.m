@@ -9,6 +9,8 @@
 #import "ServerRequest.h"
 #import "Notifications.h"
 #import "Clipboard.h"
+#import "Crypto.h"
+#import "ConfigStore.h"
 
 @implementation ServerRequest
 
@@ -135,6 +137,14 @@ didCompleteWithError:(NSError *)error{
         NSString *valueB64 = _replyDoc[@"value"];
         if(!valueB64)
             return;
+        
+        
+        //test if we have to encrypt
+        NSString *encKey = [ConfigStore loadEncKeyOne];
+        if([encKey length] > 0){
+            NSLog(@"used decryption for text");
+            valueB64 = [Crypto decryptString:valueB64 andKey:encKey];
+        }
         
         NSLog(@"pulled clipboard value: %@",valueB64);
         

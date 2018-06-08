@@ -13,6 +13,7 @@
 
 @property (nonatomic, retain) IBOutlet NSTextField* keyOneInput;
 @property (nonatomic, retain) IBOutlet NSTextField* serverInput;
+@property (nonatomic, retain) IBOutlet NSTextField* encKeyInput;
 
 @end
 
@@ -43,6 +44,7 @@
     
     [ConfigStore storeKeyOne:_keyOneInput.stringValue];
     [ConfigStore storeServerAddr:_serverInput.stringValue];
+    [ConfigStore storeEncKeyOne:_encKeyInput.stringValue];
     
     [self.window close];
 }

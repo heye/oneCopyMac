@@ -100,6 +100,13 @@
     NSString* serverAddr = [ConfigStore loadServerAddr];
     
     
+    //test if we have to encrypt
+    NSString *encKey = [ConfigStore loadEncKeyOne];
+    if([encKey length] > 0){
+        NSLog(@"used encryption for text");
+        clipboadValueB64 = [Crypto encryptString:clipboadValueB64 andKey:encKey];
+    }
+    
     if([Clipboard isFile]){
         ServerRequest *sReq = [ServerRequest alloc];
         [sReq noNotify]; //no notification for setting the file name

@@ -13,9 +13,9 @@
 
 
 + (NSData *) decryptData: (NSDictionary*) input andKey: (NSString*) key{
-    NSLog(@"DECRYPT");
-    NSLog(@"%@", key);
-    NSLog(@"%@", input);
+    //NSLog(@"DECRYPT");
+    //NSLog(@"%@", key);
+    //NSLog(@"%@", input);
     
     NSString *ivB64 = input[@"iv"];
     NSString *dataB64 = input[@"data"];
@@ -42,7 +42,7 @@
     }
     NSUInteger ciphertextLen = [ciphertext length];
     
-    NSLog(@"to decrypt ciphertext len: %lu", (unsigned long)ciphertextLen);
+    //NSLog(@"to decrypt ciphertext len: %lu", (unsigned long)ciphertextLen);
     
     std::unique_ptr<char[]> ciphertextBuff(new char[[ciphertext length]]);
     
@@ -63,7 +63,7 @@
                                      &numBytesDecrypted);
     if (status == kCCSuccess)
     {
-        NSLog(@"decrypted bytes: %lu", numBytesDecrypted);
+        //NSLog(@"decrypted bytes: %lu", numBytesDecrypted);
         
         //the returned NSData takes ownership of buffer and will free it on dealloc
         return [NSData dataWithBytes:plaintextBuff.get() length:numBytesDecrypted];
@@ -74,11 +74,11 @@
 }
 
 + (NSDictionary *) encryptData: (NSData*) input andKey: (NSString*) key{
-    NSLog(@"ENCRYPT");
+    //NSLog(@"ENCRYPT");
     
     NSMutableDictionary *outDict = [[NSMutableDictionary alloc] init];
 
-    NSString *ivB64 = @"randomiv";
+    NSString *ivB64 = @"12345678123456781234567812345678";
     
     // string -> data
     NSData *ciphertext = [[NSData alloc] init];
@@ -101,7 +101,7 @@
     
     NSUInteger plaintextLen = [input length];
     
-    NSLog(@"to encrypt plaintext len: %lu", (unsigned long)plaintextLen);
+    //NSLog(@"to encrypt plaintext len: %lu", (unsigned long)plaintextLen);
     
     std::unique_ptr<char[]> plaintextBuff(new char[plaintextLen]);
     
@@ -122,7 +122,7 @@
                                      &numBytesEncrypted);
     if (status == kCCSuccess)
     {
-        NSLog(@"encrypted bytes: %lu", numBytesEncrypted);
+        //NSLog(@"encrypted bytes: %lu", numBytesEncrypted);
         //the returned NSData takes ownership of buffer and will free it on dealloc
         NSData *ciphertext = [NSData dataWithBytes:ciphertextBuff.get() length:numBytesEncrypted];
         
@@ -144,7 +144,7 @@
 
 + (NSString *) decryptString: (NSString*) input andKey: (NSString*) key{
     NSDictionary *dict =[Crypto deserializeDict:input];
-    NSLog(@"to decrypt: %@", dict);
+    //NSLog(@"to decrypt: %@", dict);
     
     NSData *plaintextData = [Crypto decryptData:dict andKey:key];
     
@@ -156,7 +156,8 @@
     NSData *toEncrypt = [input dataUsingEncoding:NSUTF8StringEncoding];
     
     NSDictionary *encrypted = [Crypto encryptData:toEncrypt andKey:key];
-    NSLog(@"encrypted: %@", encrypted);
+    //NSLog(@"encrypted: %@", encrypted);
+    
     return [Crypto serializeDict:encrypted];
 }
 
@@ -164,18 +165,18 @@
     NSError * err;
     NSData * jsonData = [NSJSONSerialization  dataWithJSONObject:dict options:0 error:&err];
     return [jsonData base64EncodedStringWithOptions:0];
+    //return [[NSString alloc] initWithData:jsonData   encoding:NSUTF8StringEncoding];
 }
 
 + (NSDictionary *) deserializeDict: (NSString*) str {
     NSError * err;
     
     
+    //NSData *data =[str dataUsingEncoding:NSUTF8StringEncoding];
+
     NSData *data = [[NSData alloc]
                     initWithBase64EncodedString:str options:0];
     
-    
-    
-    //NSData *data =[str dataUsingEncoding:NSUTF8StringEncoding];
     NSDictionary * response;
     if(data!=nil){
         response = (NSDictionary *)[NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&err];
