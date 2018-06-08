@@ -12,6 +12,7 @@
 #import "Clipboard.h"
 #import "ServerRequest.h"
 #import "ConfigStore.h"
+#import "Crypto.h"
 
 @interface AppDelegate ()
 @property (strong) NSStatusItem *statusItem;
@@ -26,6 +27,8 @@
 @property (strong) NSImage* iconImageErr;
 @property (strong) SettingsWindow* settingsWindow;
 
+@property (strong) NSMenuItem* pushMenuItemOne;
+
 @end
 
 @implementation AppDelegate
@@ -37,6 +40,8 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
+    [Crypto test];
+    
     
     //set self as notification center delegate
     [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
@@ -54,10 +59,17 @@
     
     //init tray menu
     _menu = [NSMenu alloc];
-    [_menu addItemWithTitle:@"push" action:@selector(pushAction:) keyEquivalent:@""];
-    [_menu addItemWithTitle:@"pull" action:@selector(pullAction:) keyEquivalent:@""];
+    
+    _pushMenuItemOne = [[NSMenuItem alloc] initWithTitle:@"push clipboard" action:@selector(pushAction:) keyEquivalent:@""];
+    //[_pushMenuItemOne setImage:_iconImageDefault];
+    //[_pushMenuItemOne setOnStateImage:_iconImageDefault];
+    //[_pushMenuItemOne setOffStateImage:_iconImageDefault];
+    
+    [_menu addItem:_pushMenuItemOne];
+    [_menu addItemWithTitle:@"pull clipboard" action:@selector(pullAction:) keyEquivalent:@""];
     [_menu addItem:[NSMenuItem separatorItem]];
     [_menu addItemWithTitle:@"settings" action:@selector(settingsAction:) keyEquivalent:@""];
+    [_menu addItemWithTitle:@"quit" action:@selector(quitAction:) keyEquivalent:@""];
     _statusItem.menu = _menu;
     
     
@@ -109,6 +121,10 @@
     [_settingsWindow showWindow:self];
     
     [NSApp activateIgnoringOtherApps:YES];
+}
+
+- (IBAction)quitAction:(id)sender {
+    [NSApp terminate:self];
 }
 
 
