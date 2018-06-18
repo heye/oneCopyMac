@@ -8,6 +8,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface SettingsWindow : NSWindowController
+@interface SettingsWindow : NSWindowController <NSTabViewDelegate>
+
+- (void)tabView:(NSTabView *)tabView
+didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 
 @end

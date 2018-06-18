@@ -13,14 +13,23 @@
 +(void) storeKeyOne: (NSString*)key;
 +(NSString*) loadKeyOne;
 
++(void) storeKeyTwo: (NSString*)key;
++(NSString*) loadKeyTwo;
+
 +(void) storeLabelOne: (NSString*)key;
 +(NSString*) loadLabelOne;
 
 +(void) storeEncKeyOne: (NSString*)key;
 +(NSString*) loadEncKeyOne;
 
++(void) storeEncKeyTwo: (NSString*)key;
++(NSString*) loadEncKeyTwo;
+
 +(void) storeServerAddr: (NSString*)key;
 +(NSString*) loadServerAddr;
+
++(void) storeServerAddrTwo: (NSString*)key;
++(NSString*) loadServerAddrTwo;
 
 
 +(void) storeValue: (NSString*)value withKey: (NSString*) key;
