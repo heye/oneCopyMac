@@ -7,6 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "Menu.h"
 
 @interface AppDelegate : NSObject <NSApplicationDelegate, NSUserNotificationCenterDelegate>
 
@@ -14,6 +15,8 @@
 - (IBAction)pushAction:(id)sender;
 - (IBAction)settingsAction:(id)sender;
 - (IBAction)quitAction:(id)sender;
+
+- (Menu*) getMenu;
 
 @end
 

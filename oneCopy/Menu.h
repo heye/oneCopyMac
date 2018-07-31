@@ -13,6 +13,9 @@
 
 -(NSMenu*) getMenu;
 
+- (void) setUploading;
+- (void) unsetUploading;
+
 
 - (IBAction)buttonAction:(id)sender;
 

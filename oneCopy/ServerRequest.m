@@ -11,6 +11,8 @@
 #import "Clipboard.h"
 #import "Crypto.h"
 #import "ConfigStore.h"
+#import "Menu.h"
+#import "AppDelegate.h"
 
 @implementation ServerRequest
 
@@ -82,12 +84,14 @@ didCompleteWithError:(NSError *)error{
     if(_serverError){
         //TODO: notification
         [Notifications make:@"cannot reach the server"];
+        [self onFinish];
         return;
     }
     
     if(_localError){
         [Notifications make:@"cannot reach the server"];
         //TODO: notification
+        [self onFinish];
         return;
     }
     
@@ -97,19 +101,33 @@ didCompleteWithError:(NSError *)error{
         NSString *apiErr = _replyDoc[@"err"];
         if(apiErr){
             [Notifications make:apiErr];
+            [self onFinish];
             return;
         }
     }
     
     if (_isPull) {
         [self handlePullReply];
+        [self onFinish];
         return;
     }
     
     if (_isPush){
         [self handlePushReply];
+        [self onFinish];
         return;
     }
+}
+
+- (void)URLSession:(NSURLSession *)session
+              task:(NSURLSessionTask *)task
+   didSendBodyData:(int64_t)bytesSent
+    totalBytesSent:(int64_t)totalBytesSent
+totalBytesExpectedToSend:(int64_t)totalBytesExpectedToSend{
+    
+    float progress = 100*(float)totalBytesSent/(float)totalBytesExpectedToSend;
+    
+    NSLog(@"progress.. %f", progress);
 }
 
 - (void)URLSession:(NSURLSession *)session
@@ -160,6 +178,10 @@ didCompleteWithError:(NSError *)error{
             ServerRequest *sReq = [[ServerRequest alloc] init];
             [sReq pullFileWithKey:_apiKey andName:_fileName fromServer:_serverAddr];
  
+        }
+        else{
+            NSString *notificationString = @"pull string success";
+            [Notifications make:notificationString];
         }
     }
     
@@ -264,9 +286,27 @@ didCompleteWithError:(NSError *)error{
     _serverAddr = server;
     _apiKey = apikey;
     
+    
+    
+    AppDelegate *appDelegate = (AppDelegate *)[[NSApplication sharedApplication] delegate];
+    Menu *menu = [appDelegate getMenu];
+    [menu setUploading];
+        
     //start request
     [self makeRequestWithDATA:data toURL:urlWithKey];
 }
+
+
+-(void) onFinish{
+    
+    if(_isFilePush){
+        //TODO: make class for making notifications, call class methods instead of building each one
+        AppDelegate *appDelegate = (AppDelegate *)[[NSApplication sharedApplication] delegate];
+        Menu *menu = [appDelegate getMenu];
+        [menu unsetUploading];
+    }
+}
+
 
 @end
 

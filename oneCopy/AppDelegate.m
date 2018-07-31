@@ -80,4 +80,9 @@
 }
 
 
+- (Menu*) getMenu{
+    return _menu;
+}
+
+
 @end

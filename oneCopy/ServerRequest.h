@@ -25,6 +25,8 @@
 
 -(void) noNotification;
 
+-(void) onFinish;
+
 @property (strong) NSDictionary* replyDoc;
 @property (strong) NSMutableData* fileData;
 

@@ -9,6 +9,7 @@
 #import "Clipboard.h"
 #import "Notifications.h"
 #import <AppKit/AppKit.h>
+#import "ConfigStore.h"
 
 @implementation Clipboard
 
@@ -89,7 +90,8 @@
     
     NSLog(@"%llu", fileSize);
 
-    if(fileSize > 1000000){
+    
+    if(![ConfigStore loadAllowLargeFiles] && fileSize > 1000000){
         [Notifications make:@"file must be < 1MB"];
         return [[NSData alloc] init];
     }

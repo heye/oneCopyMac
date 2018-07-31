@@ -15,6 +15,7 @@
 @property (nonatomic, retain) IBOutlet NSTextField* serverInput;
 @property (nonatomic, retain) IBOutlet NSTextField* encKeyInput;
 @property (weak) IBOutlet NSTabView *tabButtons;
+@property (weak) IBOutlet NSButton *allowLargeFilesCheckbox;
 
 @property bool showingPrimary;
 @property bool showingKey;
@@ -97,6 +98,8 @@ didSelectTabViewItem:(NSTabViewItem *)tabViewItem{
         [ConfigStore storeKeyOne:_keyOneInput.stringValue];
         [ConfigStore storeServerAddr:_serverInput.stringValue];
         [ConfigStore storeEncKeyOne:_encKeyInput.stringValue];
+        [ConfigStore storeAllowLargeFiles:_allowLargeFilesCheckbox.integerValue];
+        NSLog(@"CHECKBOX: %ld", (long)_allowLargeFilesCheckbox.integerValue);
     }
     else{
         [ConfigStore storeKeyTwo:_keyOneInput.stringValue];

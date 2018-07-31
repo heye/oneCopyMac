@@ -31,6 +31,13 @@
 +(void) storeServerAddrTwo: (NSString*)key;
 +(NSString*) loadServerAddrTwo;
 
++(void) storeAllowLargeFiles: (BOOL) val;
++(BOOL) loadAllowLargeFiles;
+
+
++(void) storeBoolValue: (BOOL)value withKey: (NSString*) key;
++(BOOL) loadBoolValue: (NSString*)key;
+
 
 +(void) storeValue: (NSString*)value withKey: (NSString*) key;
 +(NSString*) loadValue: (NSString*)key;

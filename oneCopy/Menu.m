@@ -16,6 +16,7 @@
 @property (strong) NSMenu* menu;
 @property (strong) NSImage* iconImageDefault;
 @property (strong) NSMenuItem* pushMenuItem;
+@property (strong) NSMenuItem* pullMainItem;
 @property (strong) NSMenuItem* settingsMenuItem;
 @property (strong) NSMenuItem* quitMenuItem;
 
@@ -27,6 +28,7 @@
 @property (strong) NSMenu* subMenu;
 @property (strong) NSMenuItem* subPush;
 @property (strong) NSMenuItem* subPull;
+@property (strong) NSMenuItem* uploadingInfo;
 
 @end
 
@@ -45,15 +47,21 @@
     _menu = [NSMenu alloc];
     _changingMenuItems = [[NSMutableArray alloc] init];
     
-    
-    NSMenuItem *pullItem = [[NSMenuItem alloc] initWithTitle:@"pull xyz" action:@selector(buttonAction:) keyEquivalent:@""];
+    //TODO: enable list of last pushed files
+    /*NSMenuItem *pullItem = [[NSMenuItem alloc] initWithTitle:@"pull xyz" action:@selector(buttonAction:) keyEquivalent:@""];
     [pullItem setTarget:self];
 
-    [_changingMenuItems addObject:pullItem];
+    [_changingMenuItems addObject:pullItem];*/
     
     
+    _uploadingInfo = [[NSMenuItem alloc] initWithTitle:@"uploading..." action:@selector(buttonAction:) keyEquivalent:@""];
+    [_uploadingInfo setEnabled:false];
+    [_uploadingInfo setHidden:true];
     
     _pushMenuItem = [[NSMenuItem alloc] initWithTitle:@"#main push" action:@selector(buttonAction:) keyEquivalent:@""];
+    
+    _pullMainItem = [[NSMenuItem alloc] initWithTitle:@"#main pull" action:@selector(buttonAction:) keyEquivalent:@""];
+    
     _settingsMenuItem = [[NSMenuItem alloc] initWithTitle:@"settings" action:@selector(buttonAction:) keyEquivalent:@""];
     _quitMenuItem = [[NSMenuItem alloc] initWithTitle:@"quit" action:@selector(buttonAction:) keyEquivalent:@""];
     
@@ -71,16 +79,20 @@
     //[_pushMenuItemOne setOffStateImage:_iconImageDefault];
     
     [_pushMenuItem setTarget:self];
+    [_pullMainItem setTarget:self];
     [_settingsMenuItem setTarget:self];
     [_quitMenuItem setTarget:self];
     
     
     
+    [_menu addItem:_uploadingInfo];
     [_menu addItem:_pushMenuItem];
+    [_menu addItem:_pullMainItem];
     [_menu addItem:_subItem];
     [_menu addItem:[NSMenuItem separatorItem]];
-    [_menu addItem: pullItem];
-    [_menu addItem:[NSMenuItem separatorItem]];
+    //TODO: enable list of last pushed files
+    /*[_menu addItem: pullItem];
+    [_menu addItem:[NSMenuItem separatorItem]];*/
     [_menu addItem:_settingsMenuItem];
     [_menu addItem:_quitMenuItem];
     
@@ -92,10 +104,20 @@
     return _menu;
 }
 
+- (void) setUploading{
+    NSLog(@"setUploading");
+    [_uploadingInfo setHidden:false];
+}
+- (void) unsetUploading{
+    NSLog(@"unsetUploading");
+    [_uploadingInfo setHidden:true];
+}
+
+
 - (IBAction)buttonAction:(id)sender{
     
     if(sender == _pushMenuItem){
-        NSLog(@"push");
+        NSLog(@"push main");
         [AppLogic pushKey:[ConfigStore loadKeyOne]];
         return;
     }
@@ -109,13 +131,19 @@
         [AppLogic quitApp];
         return;
     }
+    if(sender == _pullMainItem){
+        NSLog(@"pull main");
+        [AppLogic pullKey:[ConfigStore loadKeyOne]];
+        return;
+    }
     
+    //TODO: enable list of last pushed files
     for (int i = 0; i < [_changingMenuItems count]; i++) {
-        NSMenuItem* menuItem = [_changingMenuItems objectAtIndex: i];
+        /*NSMenuItem* menuItem = [_changingMenuItems objectAtIndex: i];
         
         if(sender == menuItem){
             [AppLogic pullKey:[ConfigStore loadKeyOne]];
-        }
+        }*/
     }
 }
 

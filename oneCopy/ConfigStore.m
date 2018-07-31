@@ -26,6 +26,33 @@
     return loadedKey;
 }
 
+
+
++(void) storeBoolValue: (BOOL)value withKey: (NSString*) key {
+    NSString *valueStr = @"0";
+    if (value){
+        valueStr = @"1";
+    }
+    
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setValue:valueStr forKey:key];
+}
+
++(BOOL) loadBoolValue: (NSString*)key{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString *loadedKey = [userDefaults stringForKey:key];
+    
+    if(!loadedKey)
+        return false;
+    
+    if([loadedKey  isEqual: @"1"]){
+        return true;
+    }
+    
+    return false;
+}
+
+
 +(void) storeKeyOne:(NSString*)key {
     [self storeValue:key withKey:@"key"];
 }
@@ -87,6 +114,17 @@
 
 +(void) storeServerAddrTwo:(NSString *)key {
     [self storeValue:key withKey:@"server2"];
+}
+
+
+
++(void) storeAllowLargeFiles: (BOOL) value{
+    [self storeBoolValue:value withKey:@"allowLargeFiles"];
+}
+
++(BOOL) loadAllowLargeFiles {
+    BOOL allow = [self loadBoolValue:@"allowLargeFiles"];
+    return allow;
 }
 
 
